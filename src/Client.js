@@ -1,19 +1,18 @@
-var extend = require('util')._extend;
-var url = require('url');
-var changeCase = require('change-case');
-var deepmerge = require('deepmerge');
+var extend = require("util")._extend;
+var urlParse = require("url-parse");
+var changeCase = require("change-case");
+var deepmerge = require("deepmerge");
 
-
-var request = require('superagent');
-var Promise = require('bluebird');
-var ArgumentError = require('./exceptions').ArgumentError;
-var APIError = require('./exceptions').APIError;
-var defaultOptions = require('./defaultOptions');
-var resolveAPIErrorArg = require('./utils').resolveAPIErrorArg;
-var isFunction = require('./utils').isFunction;
+var request = require("superagent");
+var Promise = require("bluebird");
+var ArgumentError = require("./exceptions").ArgumentError;
+var APIError = require("./exceptions").APIError;
+var defaultOptions = require("./defaultOptions");
+var resolveAPIErrorArg = require("./utils").resolveAPIErrorArg;
+var isFunction = require("./utils").isFunction;
 
 // Add proxy support to the request library.
-require('superagent-proxy')(request);
+require("superagent-proxy")(request);
 
 /**
  * @class
@@ -22,16 +21,15 @@ require('superagent-proxy')(request);
  *
  * @param {String} resourceUrl  The URL for the REST ednpoint.
  */
-var Client = function (resourceUrl, options) {
+var Client = function(resourceUrl, options) {
   if (!resourceUrl) {
-    throw new ArgumentError('Missing REST endpoint URL')
+    throw new ArgumentError("Missing REST endpoint URL");
   }
 
   this.options = deepmerge(defaultOptions, options || {}, true);
-
-  this.url = url.parse(resourceUrl);
+  this.url = urlParse(resourceUrl);
+  this.url.path = this.url.path || this.url.pathname;
 };
-
 
 /**
  * Get a list of instances of the specified resource from the API.
@@ -40,7 +38,7 @@ var Client = function (resourceUrl, options) {
  * @param   {Function} [callback]   Callback to pass the response.
  * @return  {Promise}               Promise that resolve to a list.
  */
-Client.prototype.getAll = function (/* [params], [callback] */) {
+Client.prototype.getAll = function(/* [params], [callback] */) {
   var params = {};
   var callback = null;
 
@@ -49,12 +47,12 @@ Client.prototype.getAll = function (/* [params], [callback] */) {
     params = arguments[0];
     callback = arguments[1];
 
-  // Signature getAll(callback).
+    // Signature getAll(callback).
   } else if (arguments[0] instanceof Function) {
     callback = arguments[0];
 
-  // Signature getAll(urlParams).
-  } else if (typeof arguments[0] === 'object') {
+    // Signature getAll(urlParams).
+  } else if (typeof arguments[0] === "object") {
     params = arguments[0];
   }
 
@@ -71,13 +69,13 @@ Client.prototype.getAll = function (/* [params], [callback] */) {
  * @param   {Number}    id          The id of the resource to be requested.
  * @param   {Function}  [callback]  A callback to be called
  */
-Client.prototype.get = function (params, callback) {
+Client.prototype.get = function(params, callback) {
   // Prevent the getURL function from modifying this object.
   params = extend({}, params);
 
   var options = {
     url: this.getURL(params || {}),
-    method: 'GET'
+    method: "GET"
   };
 
   return this.request(options, params || {}, callback);
@@ -90,7 +88,7 @@ Client.prototype.get = function (params, callback) {
  * @param   {Object}    data    The data to be included in the body.
  * @return  {Promise}           Resolves to the response body.
  */
-Client.prototype.post = function (/* [params,] data, callback */) {
+Client.prototype.post = function(/* [params,] data, callback */) {
   var params = {};
   var data = {};
   var callback = null;
@@ -101,31 +99,31 @@ Client.prototype.post = function (/* [params,] data, callback */) {
     data = arguments[1];
     callback = arguments[2];
 
-  // Signature post(data, callback).
+    // Signature post(data, callback).
   } else if (arguments.length === 2 && arguments[1] instanceof Function) {
     data = arguments[0];
     callback = arguments[1];
 
-  // Signature post(params, data).
+    // Signature post(params, data).
   } else if (arguments.length === 2) {
     params = arguments[0];
     data = arguments[1];
 
-  // Signature post(data).
+    // Signature post(data).
   } else {
     data = arguments[0];
   }
 
-  if (typeof data !== 'object') {
-    throw new ArgumentError('Missing data object');
+  if (typeof data !== "object") {
+    throw new ArgumentError("Missing data object");
   }
 
   // Prevent the getURL function from modifying this object.
   params = extend({}, params);
 
   var options = {
-    url : this.getURL(params),
-    method: 'POST',
+    url: this.getURL(params),
+    method: "POST",
     data: data
   };
 
@@ -151,16 +149,16 @@ Client.prototype.create = Client.prototype.post;
  * @param   {Function}  [callback]  Callback function.
  * @return  {Promise}               Resolves to the updated resource.
  */
-Client.prototype.patch = function (params, data, callback) {
+Client.prototype.patch = function(params, data, callback) {
   // Prevent the getURL function from modifying this object.
   params = extend({}, params) || {};
 
-  if (typeof data !== 'object') {
-    throw new ArgumentError('The data must be an object');
+  if (typeof data !== "object") {
+    throw new ArgumentError("The data must be an object");
   }
 
   var options = {
-    method: 'PATCH',
+    method: "PATCH",
     url: this.getURL(params),
     data: data
   };
@@ -176,16 +174,16 @@ Client.prototype.patch = function (params, data, callback) {
  * @param   {Function}  [callback]  Callback function.
  * @return  {Promise}               Resolves to the response body.
  */
-Client.prototype.put = function (params, data, callback) {
+Client.prototype.put = function(params, data, callback) {
   // Prevent the getURL function from modifying this object.
   params = extend({}, params) || {};
 
-  if (typeof data !== 'object') {
-    throw new ArgumentError('The data must be an object');
+  if (typeof data !== "object") {
+    throw new ArgumentError("The data must be an object");
   }
 
   var options = {
-    method: 'PUT',
+    method: "PUT",
     url: this.getURL(params),
     data: data
   };
@@ -214,7 +212,7 @@ Client.prototype.update = Client.prototype.put;
  * @param   {Function}  [callback]  Callback function.
  * @return  {Promise}               Deletion promise.
  */
-Client.prototype.delete = function (/* [urlParams], [callback] */) {
+Client.prototype.delete = function(/* [urlParams], [callback] */) {
   var callback = null;
   var body = {};
   var params = {};
@@ -225,21 +223,21 @@ Client.prototype.delete = function (/* [urlParams], [callback] */) {
     body = arguments[1];
     callback = arguments[2];
 
-  // Signature delete(urlParams, callback).
+    // Signature delete(urlParams, callback).
   } else if (arguments.length === 2 && arguments[1] instanceof Function) {
     params = arguments[0];
     callback = arguments[1];
 
-  // Signature deletee(urlParams, body).
+    // Signature deletee(urlParams, body).
   } else if (arguments.length === 2) {
     params = arguments[0];
     body = arguments[1];
 
-  // Signature delete(callback).
+    // Signature delete(callback).
   } else if (arguments.length === 1 && arguments[0] instanceof Function) {
     callback = arguments[0];
 
-  // Signature delete(urlParams).
+    // Signature delete(urlParams).
   } else {
     params = arguments[0];
   }
@@ -248,7 +246,7 @@ Client.prototype.delete = function (/* [urlParams], [callback] */) {
   params = extend({}, params);
 
   var options = {
-    method: 'DEL',
+    method: "DEL",
     data: body,
     url: this.getURL(params)
   };
@@ -266,7 +264,7 @@ Client.prototype.delete = function (/* [urlParams], [callback] */) {
  * @param   {Function}  [callback]  Callback function.
  * @return  {Promise}               Resolves to response body.
  */
-Client.prototype.request = function (options, params, callback) {
+Client.prototype.request = function(options, params, callback) {
   var headers = this.options.headers || {};
   var errorFormatter = this.options.errorFormatter || {};
   var paramsCase = this.options.query.convertCase;
@@ -292,12 +290,11 @@ Client.prototype.request = function (options, params, callback) {
     // query string params names to the given case.
     newKey = convertCaseParams ? convertCaseParams(prevKey) : prevKey;
 
-
     // If the repeatParams flag is set to false, encode arrays in
     // the querystring as comma separated values.
     // e.g. ?a=1,2,3
     if (Array.isArray(value) && !this.options.query.repeatParams) {
-      value = value.join(',');
+      value = value.join(",");
     }
 
     queryParams[newKey] = value;
@@ -312,7 +309,7 @@ Client.prototype.request = function (options, params, callback) {
     }
   }
 
-  var promise = new Promise(function (resolve, reject) {
+  var promise = new Promise(function(resolve, reject) {
     var method = options.method.toLowerCase();
 
     // Set methods and attach the body of the request (if this is a POST request).
@@ -341,45 +338,44 @@ Client.prototype.request = function (options, params, callback) {
     }
 
     // Send the request.
-    req
-      .set('Accept', 'application/json')
-      .end(function (err, res) {
-        if (err) {
-          var reqinfo = { method : method, url : options.url };
-          var response = err.response || {};
-          var data = response.body;
-          var status = err.status;
-          var error;
+    req.set("Accept", "application/json").end(function(err, res) {
+      if (err) {
+        var reqinfo = { method: method, url: options.url };
+        var response = err.response || {};
+        var data = response.body;
+        var status = err.status;
+        var error;
 
-          var name = resolveAPIErrorArg(errorFormatter.name, data, 'APIError');
-          var message = resolveAPIErrorArg(errorFormatter.message, data, [data, err.message]);
+        var name = resolveAPIErrorArg(errorFormatter.name, data, "APIError");
+        var message = resolveAPIErrorArg(errorFormatter.message, data, [
+          data,
+          err.message
+        ]);
 
-          return reject(new APIError(name, message, status, reqinfo, err))
-        }
+        return reject(new APIError(name, message, status, reqinfo, err));
+      }
 
-        // If case conversion is enabled for the body of the response, convert
-        // the properties of the body to the specified case.
-        if (convertCaseRes) {
-          for (var key in res.body) {
-            if (res.body.hasOwnProperty(key)) {
-              res.body[convertCaseRes(key)] = res.body[key];
+      // If case conversion is enabled for the body of the response, convert
+      // the properties of the body to the specified case.
+      if (convertCaseRes) {
+        for (var key in res.body) {
+          if (res.body.hasOwnProperty(key)) {
+            res.body[convertCaseRes(key)] = res.body[key];
 
-              if (key !== convertCaseRes(key)) {
-                delete res.body[key];
-              }
+            if (key !== convertCaseRes(key)) {
+              delete res.body[key];
             }
           }
         }
+      }
 
-        resolve(res.body, res.header);
-      });
+      resolve(res.body, res.header);
+    });
   });
 
   if (!callback) return promise;
 
-  promise
-    .then(callback.bind(null, null))
-    .catch(callback);
+  promise.then(callback.bind(null, null)).catch(callback);
 };
 
 /**
@@ -388,22 +384,21 @@ Client.prototype.request = function (options, params, callback) {
  * @param   {any}     [id]  The id for the requested resource.
  * @return  {String}        The URL for the requested resource.
  */
-Client.prototype.getURL = function (params) {
-  var url = this.url.protocol + '//' + this.url.host + this.url.path;
+Client.prototype.getURL = function(params) {
+  var url = this.url.protocol + "//" + this.url.host + this.url.path;
 
-  if (typeof params  !== 'object') return url;
+  if (typeof params !== "object") return url;
 
   for (var key in params) {
-    if (url.indexOf(':' + key) > -1) {
-      url = url.replace(':' + key, params[key]);
+    if (url.indexOf(":" + key) > -1) {
+      url = url.replace(":" + key, params[key]);
       delete params[key];
     }
   }
 
-  url = url.replace(/\/:[^\/]+/g, '');
+  url = url.replace(/\/:[^\/]+/g, "");
 
   return url;
 };
-
 
 module.exports = Client;
