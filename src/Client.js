@@ -1,5 +1,5 @@
 var extend = require('util')._extend;
-var url = require('url');
+var urlParse = require('url-parse');
 var changeCase = require('change-case');
 
 var request = require('superagent');
@@ -23,7 +23,8 @@ var Client = function (resourceUrl, options) {
 
   this.options = extend({}, defaultOptions);
   this.options = extend(this.options, options);
-  this.url = url.parse(resourceUrl);
+  this.url = urlParse(resourceUrl);
+  this.url.path = this.url.path || this.url.pathname
 };
 
 
