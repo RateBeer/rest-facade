@@ -7,8 +7,6 @@ var APIError = function(name, message, status, requestInfo, originalError) {
   this.statusCode = status || (originalError && originalError.code);
   this.requestInfo = Object.assign({}, requestInfo);
   this.originalError = originalError;
-
-  Error.captureStackTrace(this, this.constructor);
 };
 
 util.inherits(APIError, Error);
