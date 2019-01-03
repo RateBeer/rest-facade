@@ -5,7 +5,7 @@ var ArgumentError = exceptions.ArgumentError;
 var APIError = exceptions.APIError;
 
 module.exports = {
-  'AgrumentError': {
+  'ArgumentError': {
     '#constructor': {
       beforeEach: function() {
         this.error = new ArgumentError('Missing data object');
@@ -85,12 +85,9 @@ module.exports = {
           expect(this.error.originalError).to.eql(this.origError);
         },
 
-      'should have a stack with the message and location the error was created':
+      'should not have a stack with the message and location the error was created':
         function () {
-          expect(this.error.stack).to.exist;
-          var stackLines = this.error.stack.split('\n');
-          expect(stackLines[0]).to.eql('Unauthorized: Invalid token');
-          expect(stackLines[1]).to.include(__filename);
+          expect(this.error.stack).to.not.exist;
         }
     }
   }
