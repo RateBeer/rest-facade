@@ -5,7 +5,7 @@ var ArgumentError = exceptions.ArgumentError;
 var APIError = exceptions.APIError;
 
 module.exports = {
-  'AgrumentError': {
+  'ArgumentError': {
     '#constructor': {
       beforeEach: function() {
         this.error = new ArgumentError('Missing data object');

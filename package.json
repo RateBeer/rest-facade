@@ -8,17 +8,19 @@
     "test": "tests"
   },
   "scripts": {
-    "coveralls":
-      "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec $(find ./tests -name *.tests.js) && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec $(find ./tests -name *.tests.js) && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "test": "mocha $(find ./tests -name *.tests.js) --opts mocha.opts",
-    "test-watch":
-      "mocha $(find ./tests -name *.tests.js) --opts mocha.opts --watch"
+    "test-watch": "mocha $(find ./tests -name *.tests.js) --opts mocha.opts --watch"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ngonzalvez/rest-facade.git"
   },
-  "keywords": ["facade", "rest", "api"],
+  "keywords": [
+    "facade",
+    "rest",
+    "api"
+  ],
   "author": "Nicolás Gonzálvez",
   "license": "MIT",
   "bugs": {
@@ -40,7 +42,7 @@
     "lodash.get": "^4.4.2",
     "superagent": "^3.8.0",
     "superagent-proxy": "^1.0.2",
-    "url-parse": "1.1.9",
+    "url-parse": "1.4.4",
     "util": "RateBeer/react-native-util#v1.0.3"
   }
 }
